@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
+  before_action :correct_user,   only: [:edit, :update]
   # GET /users
   # GET /users.json
  def index
@@ -9,7 +10,8 @@ class UsersController < ApplicationController
 
   # GET /users/1
   # GET /users/1.json
-  def show
+def show
+    @tweets = @user.tweets.paginate(page: params[:page])
   end
 
   # GET /users/new
@@ -23,21 +25,32 @@ class UsersController < ApplicationController
 
   # POST /users
   # POST /users.json
-  def create
+  # def create
+  #   @user = User.new(user_params)
+  #   file = params[:user][:image]
+  #   @user.set_image(file)
+  #   respond_to do |format|
+  #     if @user.save
+  #       format.html { redirect_to @user, notice: 'User was successfully created.' }
+  #       format.json { render action: 'show', status: :created, location: @user }
+  #     else
+  #       format.html { render action: 'new' }
+  #       format.json { render json: @user.errors, status: :unprocessable_entity }
+  #     end
+  #   end
+  # end
+def create
     @user = User.new(user_params)
     file = params[:user][:image]
     @user.set_image(file)
-    respond_to do |format|
-      if @user.save
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.json { render action: 'show', status: :created, location: @user }
-      else
-        format.html { render action: 'new' }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+    if @user.save
+      sign_in @user
+      flash[:success] = "Welcome to Twitter!"
+      redirect_to @user
+    else
+      render 'new'
     end
   end
-
 
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
@@ -63,14 +76,48 @@ class UsersController < ApplicationController
     end
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
+def following
+    @title = "Following"
+    @user = User.find(params[:id])
+    @users = @user.followings.paginate(page: params[:page])
+    render 'show_follow'
+  end
+
+  def followers
+    @title = "Followers"
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(page: params[:page])
+    render 'show_follow'
+  end
+
+private
+
+    def user_params
+      params.require(:user).permit(:name, :email, :password,
+                                   :password_confirmation)
+    end
+
+    # Before actions
+
     def set_user
       @user = User.find(params[:id])
     end
-
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+    
+    def correct_user
+      @user = User.find(params[:id])
+      redirect_to(root_path) unless current_user?(@user)
     end
+
 end
+
+#   private
+#     # Use callbacks to share common setup or constraints between actions.
+#     def set_user
+#       @user = User.find(params[:id])
+#     end
+
+#     # Never trust parameters from the scary internet, only allow the white list through.
+#     def user_params
+#       params.require(:user).permit(:name, :email, :password, :password_confirmation)
+#     end
+# end

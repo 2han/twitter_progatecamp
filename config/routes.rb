@@ -1,8 +1,17 @@
-Twitter::Application.routes.draw do
+Rails.application.routes.draw do
   root  'about#index'
+  match '/signin',  to: 'sessions#new',         via: 'get'
+  match '/signout', to: 'sessions#destroy',     via: 'delete'
   match '/about', to:'about#index', via:'get'
-  resources :users
   resources :tweets
+  resources :users do
+    member do
+      get :following, :followers, :favorite
+    end
+  end
+  resources :sessions, only: [:new, :create, :destroy]
+  resources :favorites, only: [:create, :destroy]
+  resources :relationships, only: [:create, :destroy]
 end
 
   # The priority is based upon order of creation: first created -> highest priority.
