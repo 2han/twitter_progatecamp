@@ -45,17 +45,16 @@ class User < ActiveRecord::Base
     following_relationships.find_by(following_id: other_user.id).destroy
   end
 # お気に入りしているか？か調べる
-  def favorites?(tweet)
-    # Favorite.find_by(users_id: self.id, tweet_id: tweet.id)
-    favorites_relationships.find_by(tweet_id: tweet.id)
+  def favorite?(tweet)
+    favorites.find_by(tweet_id: tweet.id)
   end
 
   def favorite!(tweet)
-    favorites_relationships.create!(tweet_id: tweet.id)
+    favorites.create!(tweet_id: tweet.id)
   end
 
   def unfavorite!(tweet)
-    favorites_relationships.find_by(tweet_id: tweet.id).destroy
+    favorites.find_by(tweet_id: tweet.id).destroy
   end
 
   def User.new_remember_token
