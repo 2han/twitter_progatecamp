@@ -3,3 +3,13 @@
 <% else %>
     <%= render 'favorites/create', tweet: tweet %>
 <% end %>
+<div class="favorite-btn btn">
+	<%= tweet.favorites.count %>
+	<div class="favorite-users">
+      <div class="favorite-users-modal">
+      <% tweet.favoriting_users.each do |user|  %>
+        <div><%= user.name %></div>
+      <% end%>
+      </div>
+    </div>
+</div>

@@ -3,12 +3,18 @@ Rails.application.routes.draw do
   match '/signin',  to: 'sessions#new',         via: 'get'
   match '/signout', to: 'sessions#destroy',     via: 'delete'
   match '/about', to:'about#index', via:'get'
-  resources :tweets
   resources :users do
     member do
       get :following, :followers, :favorite
     end
   end
+
+  resources :tweets do
+    member do
+      get :favorites
+    end
+  end
+
   resources :sessions, only: [:new, :create, :destroy]
   resources :favorites, only: [:create, :destroy]
   resources :relationships, only: [:create, :destroy]
