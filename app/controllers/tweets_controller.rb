@@ -1,5 +1,5 @@
   class TweetsController < ApplicationController
-  before_action :set_tweet, only: [:show, :edit, :update, :destroy]
+  before_action :set_tweet, only: [:show, :edit, :update, :destroy, :favorite]
   before_action :signed_in_user, only: [:create, :destroy]
   before_action :correct_user,   only: :destroy
   # GET /tweets
@@ -65,7 +65,11 @@
     @tweet.destroy
     redirect_to root_url
   end
-
+# アクション名がファイル名（favorites.html.erb）になる。コントローラー名がフォルダ名（tweetsフォルダ）になる
+  def favorite
+    # @tweetをお気に入りしているユーザーを取得
+    @users = @tweet.favoriting_users.pagenate(page: params[:page])
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
